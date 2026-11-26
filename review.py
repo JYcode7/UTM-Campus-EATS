@@ -1,21 +1,29 @@
 #This part was edited by Jerred Yuan
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+from models import SQLModel
 class Application(tk.Tk): 
     def __init__(self): 
         super().__init__() 
-        self.title("UTM Campus EATS") 
+        self.title("UTM Campus EATS")
+        self.model = SQLModel() 
         self._build_widgets() 
     def _build_widgets(self): 
         tk.Label(self, text="Students Review").grid(row=0, column=0)#use grid to place the label in the first row
-
+        self.student_var = tk.IntVar()
+        self.student_var.set(1)
+        student_frame = tk.Frame(self)
+        student_frame.grid(row=0, column=1, sticky="w")
+        tk.Radiobutton(student_frame, text="Student 1", value=1, variable=self.student_var).grid(row=0, column=0)
+        tk.Radiobutton(student_frame, text="Student 2", value=2, variable=self.student_var).grid(row=0, column=1)
         tk.Label(self, text="Restaurant").grid(row=1, column=0)
         self.restaurant = tk.IntVar()#create an IntVar to store the value of the selected restaurant
         Restaurant_frame = tk.Frame(self)#Nesting restaurant options
         Restaurant_frame.grid(row=1, column=1, columnspan=4, sticky="w")
         tk.Radiobutton(self, text="Subway", value=1, variable=self.restaurant).grid(row=1, column=1)#first restaurant option
         tk.Radiobutton(self, text="Tim Hortons", value=2, variable=self.restaurant).grid(row=1, column=2)#second restaurant option
-        tk.Radiobutton(self, text="Harveys", value=3, variable=self.restaurant).grid(row=1, column=3)#third restaurant option
+        tk.Radiobutton(self, text="Harvey's", value=3, variable=self.restaurant).grid(row=1, column=3)#third restaurant option
        
         tk.Label(self, text="TasteRating").grid(row=2, column=0)#Create a label for the rating
         self.rating = tk.IntVar()#create an IntVar to store the value of the selected rating
@@ -68,10 +76,9 @@ class Application(tk.Tk):
         tk.Radiobutton(environment_frame, text="5", value=5, variable=self.environment).grid(row=0, column=4)
 
         tk.Label(self, text="Comments（Optional）").grid(row=7, column=0, sticky="nw")#Create a label for the comments
-        self.comments = tk.Text(self)
-        self.comments.config(height=3, width=20)
+        self.comment_var = tk.StringVar()
+        self.comments = ttk.Entry(self, textvariable=self.comment_var)
         self.comments.grid(row=7, column=1, columnspan=4, sticky="w")
-
         tk.Button(self, text="Save", command=self.check_review).grid(row=8, column=1)#Create a save button
     
     def check_review(self):
@@ -84,8 +91,28 @@ class Application(tk.Tk):
             messagebox.showerror("Missing information", "Please select a freshness rating")
         elif not self.environment.get():
             messagebox.showerror("Missing information", "Please select an environment rating")
+        elif not self.serving_speed.get():
+            messagebox.showerror("Missing information", "Please select a serving speed rating")
+        elif not self.value_for_money.get():
+            messagebox.showerror("Missing information", "Please select a value for money rating")
         else:
-            messagebox.showinfo("Success", "Review submitted successfully.")
-  
+            try:
+                student = self.student_var.get()
+                print(student)
+                self.model.create_review(  
+                    student,
+                    restaurant,
+                    self.rating.get(),
+                    self.serving_speed.get(),
+                    self.value_for_money.get(),
+                    self.freshness.get(),
+                    self.environment.get(),
+                    self.comment_var.get(),  # Placeholder comment
+                    None
+                )
+                messagebox.showinfo("Success", "Review submitted successfully.")
+            except ValueError:
+                messagebox.showerror("Error", "Failed to submit review. Please try again.")
+
 
 Application().mainloop()

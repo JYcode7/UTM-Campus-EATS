@@ -35,7 +35,7 @@ c.execute(
 
 c.execute(
     "INSERT INTO restaurants (restaurant_id, name) VALUES (?, ?)",
-    (3, "Harvey")
+    (3, "Harvey's")
 )
 
 conn.commit()
