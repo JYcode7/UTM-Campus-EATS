@@ -31,10 +31,7 @@ class SQLModel:
         return self.c.fetchall()
 
     
-    def create_review(
-        self, student_id, restaurant_id, review_taste,
-        serving_speed, value_for_money, freshness,
-        environment, comments, photo):
+    def create_review(self, student_id, restaurant_id, review_taste,serving_speed, value_for_money, freshness,environment, comments, photo):
         for score in (
             review_taste, serving_speed, value_for_money,
             freshness, environment
@@ -72,15 +69,8 @@ class SQLModel:
         self.conn.commit()
 
 
-    def update_review(
-        self, review_id, student_id, review_taste,
-        serving_speed, value_for_money, freshness,
-        environment, comments, photo
-    ):
-        for score in (
-            review_taste, serving_speed, value_for_money,
-            freshness, environment
-        ):
+    def update_review(self, review_id, student_id, review_taste,serving_speed, value_for_money, freshness,environment, comments, photo):
+        for score in (review_taste, serving_speed, value_for_money,freshness, environment):
             if type(score) != int:
                 raise ValueError("Each rating must be an integer.")
 
@@ -97,11 +87,7 @@ class SQLModel:
                 comments = ?,
                 photo = ?
             WHERE review_id = ? AND student_id = ?
-        """, (
-            review_taste, serving_speed, value_for_money,
-            freshness, environment, comments, photo,
-            review_id, student_id
-        ))
+        """, (review_taste, serving_speed, value_for_money,freshness, environment, comments, photo,review_id, student_id))
 
         self.conn.commit()
         return self.c.rowcount
